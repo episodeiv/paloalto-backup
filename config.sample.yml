@@ -1,0 +1,8 @@
+---
+
+key: "[API KEY]"
+repository: "/path/to/backup/folder"
+push: "origin"
+targets:
+  - "IP ADDRESS"
+  - "IP ADDRESS"
