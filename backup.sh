@@ -21,11 +21,11 @@ DATE=$(date +%Y%m%d)
 TARGET="/home/TANNENHOF/dv_lichten/fw"
 BACKUPFILE="${TARGET}/${FIREWALLNAME}-${HOST}-${DATE}.xml"
 
-mkdir ${TARGET} > /dev/null
+mkdir -p ${TARGET}
 
 URL="https://${HOST}/api/?type=op&cmd=<show><config><running></running></config></show>&key=${KEY}"
 
-curl --output ${BACKUPFILE} --insecure $URL > /dev/null
+curl --silent --output "${BACKUPFILE}" --insecure "${URL}" > /dev/null
 
-sed  -i 's/<response status="success"><result>//' ${BACKUPFILE}
-sed  -i 's/<\/result><\/response>//' ${BACKUPFILE}
+sed  -i 's/<response status="success"><result>//' "${BACKUPFILE}"
+sed  -i 's/<\/result><\/response>//' "${BACKUPFILE}"
