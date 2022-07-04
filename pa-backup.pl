@@ -6,6 +6,7 @@ use Git::Repository;
 use LWP::UserAgent ();
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use Path::Tiny;
+use XML::Simple;
 use YAML::Tiny;
 
 my $configfile = 'config.yaml';
@@ -27,6 +28,10 @@ my $ua = LWP::UserAgent->new(
 	timeout => 10,
 	ssl_opts => { SSL_verify_mode => SSL_VERIFY_NONE, verify_hostname => 0},
 );
+
+if($config->{generate_api_key}) {
+	$config->{key} = generateAPIKey($ua, $config);
+}
 
 for my $target (@{$config->{targets}}) {
 	my $url = "https://".$target."/api/?type=op&cmd=<show><config><running></running></config></show>&key=".$config->{key};
@@ -56,4 +61,26 @@ $repo->run( commit => '-m', 'pa-backup run at '.localtime(time));
 if($config->{push}) {
 	print "Pushing changes\n";
 	$repo->run( push => $config->{push})
+}
+
+
+sub generateAPIKey {
+	my $ua = shift;
+	my $config = shift;
+
+	my $url = "https://".$config->{targets}->[0]."/api/?type=keygen&user=".$config->{username}."&password=".$config->{password};
+
+	my $response = $ua->get($url);
+
+	if(!$response->is_success) {
+		die("Error generating an API key: ".$response->status_line);
+	}
+
+	my $parsed_response = XMLin($response->decoded_content);
+	if($parsed_response->{status} ne "success") {
+		die("Firewall didn't report 'success' generating an API key: ".$response->decoded_content);
+	}
+
+	return $parsed_response->{result}->{key};
+
 }

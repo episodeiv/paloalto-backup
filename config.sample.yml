@@ -1,6 +1,12 @@
 ---
 
+## You can either provide an API key directly or a username and password for an account
+##  that has at least readonly superuser privileges. If you then set `generate_api_key` to true,
+##  an API key will be created upon every request
 key: "[API KEY]"
+username: "[READONLY USER]"
+password: "[READONLY PASSWORD]"
+generate_api_key: false
 repository: "/path/to/backup/folder"
 push: "origin"
 targets:
